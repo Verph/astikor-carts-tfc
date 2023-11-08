@@ -107,6 +107,7 @@ public class PlowEntity extends AbstractDrawnInventoryEntity {
         }
     }
 
+    // Make sow seeds if in slots
     public void plow(final Player player)
     {
         for (int i = 0; i < SLOT_COUNT; i++)

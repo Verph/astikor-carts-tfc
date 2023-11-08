@@ -1,12 +1,12 @@
 modLoader="javafml"
 loaderVersion="[40,)"
-issueTrackerURL="https://github.com/MennoMax/astikor-carts/issues"
+issueTrackerURL="https://github.com/Verph/astikor-carts-tfc/issues"
 license="MIT"
 [[mods]]
 modId="astikorcarts"
 version="${file.jarVersion}"
-displayName="AstikorCarts"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/astikorcarts"
+displayName="TFC AstikorCarts"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/astikor-carts-tfc"
 # A file name (in the root of the mod JAR) containing a logo for display
 #logoFile="examplemod.png"
 authors="MennoMax, pau101, Verph"
