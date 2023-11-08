@@ -1,0 +1,31 @@
+{
+  "rewards": {
+    "recipes": [
+      "tfcastikorcarts:crafting/plow/sloe"
+    ]
+  },
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "tfcastikorcarts:crafting/plow/sloe"
+      }
+    },
+    "has_wheel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "tfcastikorcarts:wheel/sloe"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wheel"
+    ]
+  ]
+}

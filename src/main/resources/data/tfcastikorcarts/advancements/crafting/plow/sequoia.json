@@ -1,0 +1,31 @@
+{
+  "rewards": {
+    "recipes": [
+      "tfcastikorcarts:crafting/plow/sequoia"
+    ]
+  },
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "tfcastikorcarts:crafting/plow/sequoia"
+      }
+    },
+    "has_wheel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "tfcastikorcarts:wheel/sequoia"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wheel"
+    ]
+  ]
+}

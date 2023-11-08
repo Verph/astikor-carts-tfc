@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ppp",
+    "pbp",
+    "wrw"
+  ],
+  "key": {
+    "b": {
+      "item": "tfc:brass_mechanisms"
+    },
+    "r": {
+      "tag": "forge:rods"
+    },
+    "p": {
+      "item": "tfc:wood/lumber/spruce"
+    },
+    "w": {
+      "item": "tfcastikorcarts:wheel/spruce"
+    }
+  },
+  "result": {
+    "item": "tfcastikorcarts:animal_cart/spruce"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "replace": false,
+  "values": [
+    "tfcastikorcarts:wheel/acacia",
+    "tfcastikorcarts:wheel/ash",
+    "tfcastikorcarts:wheel/aspen",
+    "tfcastikorcarts:wheel/birch",
+    "tfcastikorcarts:wheel/blackwood",
+    "tfcastikorcarts:wheel/chestnut",
+    "tfcastikorcarts:wheel/douglas_fir",
+    "tfcastikorcarts:wheel/hickory",
+    "tfcastikorcarts:wheel/kapok",
+    "tfcastikorcarts:wheel/maple",
+    "tfcastikorcarts:wheel/oak",
+    "tfcastikorcarts:wheel/palm",
+    "tfcastikorcarts:wheel/pine",
+    "tfcastikorcarts:wheel/rosewood",
+    "tfcastikorcarts:wheel/sequoia",
+    "tfcastikorcarts:wheel/spruce",
+    "tfcastikorcarts:wheel/sycamore",
+    "tfcastikorcarts:wheel/white_cedar",
+    "tfcastikorcarts:wheel/willow"
+  ]
+}

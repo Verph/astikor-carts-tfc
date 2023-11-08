@@ -1,0 +1,25 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "replace": false,
+  "values": [
+    "tfcastikorcarts:animal_cart/acacia",
+    "tfcastikorcarts:animal_cart/ash",
+    "tfcastikorcarts:animal_cart/aspen",
+    "tfcastikorcarts:animal_cart/birch",
+    "tfcastikorcarts:animal_cart/blackwood",
+    "tfcastikorcarts:animal_cart/chestnut",
+    "tfcastikorcarts:animal_cart/douglas_fir",
+    "tfcastikorcarts:animal_cart/hickory",
+    "tfcastikorcarts:animal_cart/kapok",
+    "tfcastikorcarts:animal_cart/maple",
+    "tfcastikorcarts:animal_cart/oak",
+    "tfcastikorcarts:animal_cart/palm",
+    "tfcastikorcarts:animal_cart/pine",
+    "tfcastikorcarts:animal_cart/rosewood",
+    "tfcastikorcarts:animal_cart/sequoia",
+    "tfcastikorcarts:animal_cart/spruce",
+    "tfcastikorcarts:animal_cart/sycamore",
+    "tfcastikorcarts:animal_cart/white_cedar",
+    "tfcastikorcarts:animal_cart/willow"
+  ]
+}

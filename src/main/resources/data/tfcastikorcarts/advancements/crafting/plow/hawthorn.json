@@ -1,0 +1,31 @@
+{
+  "rewards": {
+    "recipes": [
+      "tfcastikorcarts:crafting/plow/hawthorn"
+    ]
+  },
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "tfcastikorcarts:crafting/plow/hawthorn"
+      }
+    },
+    "has_wheel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "tfcastikorcarts:wheel/hawthorn"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wheel"
+    ]
+  ]
+}

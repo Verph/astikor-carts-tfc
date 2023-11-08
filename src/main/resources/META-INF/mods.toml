@@ -2,33 +2,39 @@ modLoader="javafml"
 loaderVersion="[40,)"
 issueTrackerURL="https://github.com/Verph/astikor-carts-tfc/issues"
 license="MIT"
-[[mods]]
-modId="astikorcarts"
-version="${file.jarVersion}"
-displayName="TFC AstikorCarts"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/astikor-carts-tfc"
-# A file name (in the root of the mod JAR) containing a logo for display
-#logoFile="examplemod.png"
-authors="MennoMax, pau101, Verph"
-description="This mod adds carts that can be pulled by other entities to the game.\nTo attach an entity, press the \"Action Key\" specified in the controls.\n\nYou might have to add the entity in the config file first."
 
-[[dependencies.astikorcarts]]
+[[mods]]
+modId="tfcastikorcarts"
+version="${file.jarVersion}"
+displayName="TFC Astikor Carts"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/astikor-carts-tfc"
+authors="MennoMax, pau101, Verph"
+description="Bringing the carts to TFC."
+
+[[dependencies.tfcastikorcarts]]
+    modId = "astikorcarts"
+    mandatory = true
+    versionRange = "[1,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.tfcastikorcarts]]
 	mandatory = true
 	modId = "tfc"
 	ordering = "AFTER"
 	side = "BOTH"
-	versionRange = "[1.18.2-2,)"
-
-[[dependencies.astikorcarts]]
+	versionRange = "[1.20.1-3,)"
+	
+[[dependencies.tfcastikorcarts]]
     modId = "forge"
-    mandatory=true
-    versionRange="[40,)"
-    ordering="NONE"
-    side="BOTH"
+    mandatory = true
+    versionRange = "[47.1.3,47.1.36)"
+    ordering = "AFTER"
+    side = "BOTH"
 
-[[dependencies.astikorcarts]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.18.2,)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.tfcastikorcarts]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "[1.20.1,1.20.2)"
+    ordering = "NONE"
+    side = "BOTH"

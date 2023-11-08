@@ -1,0 +1,25 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "replace": false,
+  "values": [
+    "tfcastikorcarts:supply_cart/acacia",
+    "tfcastikorcarts:supply_cart/ash",
+    "tfcastikorcarts:supply_cart/aspen",
+    "tfcastikorcarts:supply_cart/birch",
+    "tfcastikorcarts:supply_cart/blackwood",
+    "tfcastikorcarts:supply_cart/chestnut",
+    "tfcastikorcarts:supply_cart/douglas_fir",
+    "tfcastikorcarts:supply_cart/hickory",
+    "tfcastikorcarts:supply_cart/kapok",
+    "tfcastikorcarts:supply_cart/maple",
+    "tfcastikorcarts:supply_cart/oak",
+    "tfcastikorcarts:supply_cart/palm",
+    "tfcastikorcarts:supply_cart/pine",
+    "tfcastikorcarts:supply_cart/rosewood",
+    "tfcastikorcarts:supply_cart/sequoia",
+    "tfcastikorcarts:supply_cart/spruce",
+    "tfcastikorcarts:supply_cart/sycamore",
+    "tfcastikorcarts:supply_cart/white_cedar",
+    "tfcastikorcarts:supply_cart/willow"
+  ]
+}
