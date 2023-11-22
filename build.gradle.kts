@@ -17,7 +17,7 @@ val minecraftVersion: String = "1.20.1"
 // In future we probably want to track NeoForge versions, especially post-1.20 breaking change window
 val forgeVersion: String = "47.1.3"
 val mixinVersion: String = "0.8.5"
-val modVersion: String = System.getenv("VERSION") ?: "1.1.7.1"
+val modVersion: String = System.getenv("VERSION") ?: "1.1.7.2"
 
 val modId: String = "tfcastikorcarts"
 
