@@ -55,7 +55,7 @@ repositories {
 
 dependencies {
     minecraft("net.minecraftforge", "forge", version = "$minecraftVersion-$forgeVersion")
-    implementation(fg.deobf("curse.maven:terrafirmacraft-302973:4845122"))
+    implementation(fg.deobf("curse.maven:terrafirmacraft-302973:4875028"))
     implementation(fg.deobf("de.mennomax:astikorcarts:1.20.x-1.1.6"))
 
     if (System.getProperty("idea.sync.active") != "true") {
