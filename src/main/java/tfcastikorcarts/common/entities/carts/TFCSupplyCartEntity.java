@@ -1,17 +1,19 @@
 package tfcastikorcarts.common.entities.carts;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.function.Supplier;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
-import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
-import de.mennomax.astikorcarts.inventory.container.SupplyCartContainer;
-import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
-import net.dries007.tfc.common.container.ISlotCallback;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -29,6 +31,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -39,14 +42,19 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
+import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
+import de.mennomax.astikorcarts.inventory.container.SupplyCartContainer;
+import de.mennomax.astikorcarts.util.CartItemStackHandler;
+import net.dries007.tfc.common.TFCEffects;
+import net.dries007.tfc.common.capabilities.size.IItemSize;
+import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
+import net.dries007.tfc.common.container.ISlotCallback;
+import net.dries007.tfc.util.Helpers;
+import tfcastikorcarts.TFCAstikorCarts;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.function.Supplier;
+import tfcastikorcarts.util.AstikorHelpers;
 
 public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements Container, ISlotCallback
 {
@@ -78,6 +86,56 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     public AstikorCartsConfig.CartConfig getConfig()
     {
         return AstikorCartsConfig.get().supplyCart;
+    }
+
+    @Override
+    public void pulledTick()
+    {
+        super.pulledTick();
+        if (!this.level().isClientSide)
+        {
+            Player player = null;
+            if (this.getPulling() instanceof Player pl)
+            {
+                player = pl;
+            }
+            else if (this.getPulling().getControllingPassenger() instanceof Player pl)
+            {
+                player = pl;
+            }
+            if (player != null)
+            {
+                float weightFactor = countOverburdened();
+                if (weightFactor > TFCAstikorCartsConfig.COMMON.exhaustedThreshold.get())
+                {
+                    player.addEffect(Helpers.getExhausted(false));
+                }
+                if (weightFactor > TFCAstikorCartsConfig.COMMON.overburdenedThreshold.get())
+                {
+                    player.addEffect(Helpers.getOverburdened(false));
+                }
+                if (weightFactor > TFCAstikorCartsConfig.COMMON.pinnedThreshold.get())
+                {
+                    player.addEffect(new MobEffectInstance(TFCEffects.EXHAUSTED.get(), 25, 0, false, false));
+                }
+            }
+        }
+    }
+
+    public float countOverburdened()
+    {
+        float count = 0;
+        for (int i = 0; i < this.inventory.getSlots(); i++)
+        {
+            final ItemStack stack = this.inventory.getStackInSlot(i);
+            if (!stack.isEmpty())
+            {
+                IItemSize size = ItemSizeManager.get(stack);
+                float weightFactor = AstikorHelpers.getWeightFactor(size.getWeight(stack), size.getSize(stack));
+                count += weightFactor;
+            }
+        }
+        return count;
     }
 
     @Override
@@ -120,8 +178,11 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
                     for (int n = 1; n <= count && pos < CARGO.size(); n++)
                     {
                         final ItemStack stack = stacks.getOrDefault(entry.getKey(), ItemStack.EMPTY).copy();
-                        stack.setCount(Math.min(stack.getMaxStackSize(), entry.getIntValue() / n));
-                        items[pos++] = stack;
+                        if (isValid(stack))
+                        {
+                            stack.setCount(Math.min(stack.getMaxStackSize(), entry.getIntValue() / n));
+                            items[pos++] = stack;
+                        }
                     }
                 }
                 for (int i = 0; i < CARGO.size(); i++)
