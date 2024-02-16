@@ -1,6 +1,7 @@
 package tfcastikorcarts.common.entities.carts;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -9,6 +10,7 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonParseException;
+
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -45,19 +47,29 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
-import de.mennomax.astikorcarts.inventory.container.SupplyCartContainer;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
+
 import net.dries007.tfc.common.TFCEffects;
 import net.dries007.tfc.common.capabilities.size.IItemSize;
 import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
 import net.dries007.tfc.common.container.ISlotCallback;
 import net.dries007.tfc.util.Helpers;
-import tfcastikorcarts.TFCAstikorCarts;
+
+import tfcastikorcarts.client.sound.TFCCartingJukeboxSound;
+import tfcastikorcarts.common.container.ContainerList;
+import tfcastikorcarts.common.container.ContainerTypes;
+import tfcastikorcarts.common.container.RestrictedCartContainer;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
 import tfcastikorcarts.util.AstikorHelpers;
 
+@SuppressWarnings("null")
 public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements Container, ISlotCallback
 {
+    /*public static final String LEASH_TAG = "Leash";
+    @Nullable public Entity leashHolder;
+    public int delayedLeashHolderId;
+    @Nullable public CompoundTag leashInfoTag;*/
+
     public static boolean isValid(ItemStack stack)
     {
         return ItemSizeManager.get(stack).getSize(stack).isEqualOrSmallerThan(TFCAstikorCartsConfig.COMMON.maxItemSize.get());
@@ -65,6 +77,12 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
 
     @Override
     public boolean isItemValid(int slot, ItemStack stack)
+    {
+        return isValid(stack);
+    }
+
+    @Override
+    public boolean canPlaceItem(int index, ItemStack stack)
     {
         return isValid(stack);
     }
@@ -88,10 +106,15 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
         return AstikorCartsConfig.get().supplyCart;
     }
 
+    @SuppressWarnings("null")
     @Override
     public void pulledTick()
     {
         super.pulledTick();
+        if (this.getPulling() == null)
+        {
+            return;
+        }
         if (!this.level().isClientSide)
         {
             Player player = null;
@@ -141,7 +164,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     @Override
     public ItemStackHandler initInventory()
     {
-        return new CartItemStackHandler<TFCSupplyCartEntity>(54, this)
+        return new CartItemStackHandler<TFCSupplyCartEntity>(ContainerList.getSlots(TFCAstikorCartsConfig.COMMON.supplyCartInventorySize.get()), this)
         {
             @Override
             public void onLoad()
@@ -225,13 +248,54 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
         }
         if (!this.level().isClientSide)
         {
-            return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
+            boolean flag = player.startRiding(this);
+            /*if (flag && this.isLeashed())
+            {
+                this.dropLeash(true, true);
+            }*/
+            return flag ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         if (!isValid(held))
         {
             return InteractionResult.FAIL;
         }
+        /*if (this.getLeashHolder() == player)
+        {
+            this.dropLeash(true, !player.getAbilities().instabuild);
+            this.gameEvent(GameEvent.ENTITY_INTERACT, player);
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+        else
+        {
+            InteractionResult result = this.checkAndHandleImportantInteractions(player, hand);
+            if (result.consumesAction())
+            {
+                this.gameEvent(GameEvent.ENTITY_INTERACT, player);
+                return result;
+            }
+            else
+            {
+                result = InteractionResult.PASS;
+                if (result.consumesAction())
+                {
+                    this.gameEvent(GameEvent.ENTITY_INTERACT, player);
+                    return result;
+                }
+            }
+        }*/
         return InteractionResult.SUCCESS;
+    }
+
+    public InteractionResult checkAndHandleImportantInteractions(Player player, InteractionHand hand)
+    {
+        ItemStack itemstack = player.getItemInHand(hand);
+        /*if (itemstack.is(Items.LEAD) && this.canBeLeashed(player))
+        {
+            this.setLeashedTo(player, true);
+            itemstack.shrink(1);
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }*/
+        return InteractionResult.PASS;
     }
 
     public boolean insertDisc(final Player player, final ItemStack held)
@@ -292,13 +356,15 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     {
         if (id == 5)
         {
-            /*for (final EntityDataAccessor<ItemStack> slot : CARGO) {
+            for (final EntityDataAccessor<ItemStack> slot : CARGO)
+            {
                 final ItemStack disc = DiscTag.get(this.entityData.get(slot)).disc;
-                if (!disc.isEmpty()) {
-                    CartingJukeboxSound.play(this, disc);
+                if (!disc.isEmpty())
+                {
+                    TFCCartingJukeboxSound.play(this, disc);
                     break;
                 }
-            }*/
+            }
         }
         else
         {
@@ -360,8 +426,9 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     {
         if (!this.level().isClientSide)
         {
+            ContainerList containerSize = TFCAstikorCartsConfig.COMMON.supplyCartInventorySize.get();
             player.openMenu(new SimpleMenuProvider((id, inv, plyr) -> {
-                return new SupplyCartContainer(id, inv, this);
+                return new RestrictedCartContainer(containerSize.getMenuType(), id, inv, this, containerSize);
             }, this.getDisplayName()));
         }
     }
@@ -512,4 +579,151 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
             return true;
         }
     }
+
+    /*@Override
+    public void tick()
+    {
+        super.tick();
+        if (!this.level().isClientSide)
+        {
+            this.tickLeash();
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(final CompoundTag compound)
+    {
+        super.addAdditionalSaveData(compound);
+        if (this.leashHolder != null)
+        {
+            CompoundTag tag = new CompoundTag();
+            if (this.leashHolder instanceof LivingEntity)
+            {
+                UUID uuid = this.leashHolder.getUUID();
+                tag.putUUID("UUID", uuid);
+            }
+            else if (this.leashHolder instanceof HangingEntity)
+            {
+                BlockPos blockpos = ((HangingEntity)this.leashHolder).getPos();
+                tag.putInt("X", blockpos.getX());
+                tag.putInt("Y", blockpos.getY());
+                tag.putInt("Z", blockpos.getZ());
+            }
+            compound.put("Leash", tag);
+        }
+        else if (this.leashInfoTag != null)
+        {
+            compound.put("Leash", this.leashInfoTag.copy());
+        }
+    }
+
+    @Override
+    public void readAdditionalSaveData(final CompoundTag compound)
+    {
+        super.readAdditionalSaveData(compound);
+        if (compound.contains("Leash", 10))
+        {
+            this.leashInfoTag = compound.getCompound("Leash");
+        }
+    }
+
+    public void tickLeash()
+    {
+        if (this.leashInfoTag != null)
+        {
+            this.restoreLeashFromSave();
+        }
+        if (this.leashHolder != null)
+        {
+            if (!this.isAlive() || !this.leashHolder.isAlive())
+            {
+                this.dropLeash(true, true);
+            }
+        }
+    }
+
+    public void dropLeash(boolean broadcastPacket, boolean dropLeash)
+    {
+        if (this.leashHolder != null)
+        {
+            this.leashHolder = null;
+            this.leashInfoTag = null;
+            if (!this.level().isClientSide && dropLeash)
+            {
+                this.spawnAtLocation(Items.LEAD);
+            }
+            if (!this.level().isClientSide && broadcastPacket && this.level() instanceof ServerLevel)
+            {
+                ((ServerLevel)this.level()).getChunkSource().broadcast(this, new ClientboundSetEntityLinkPacket(this, (Entity)null));
+            }
+        }
+    }
+
+    public boolean canBeLeashed(Player player)
+    {
+        return !this.isLeashed() && !(this instanceof Enemy);
+    }
+
+    public boolean isLeashed()
+    {
+        return this.leashHolder != null;
+    }
+
+    @Nullable
+    public Entity getLeashHolder()
+    {
+        if (this.leashHolder == null && this.delayedLeashHolderId != 0 && this.level().isClientSide)
+        {
+            this.leashHolder = this.level().getEntity(this.delayedLeashHolderId);
+        }
+        return this.leashHolder;
+    }
+
+    public void setLeashedTo(Entity leashHolder, boolean broadcastPacket)
+    {
+        this.leashHolder = leashHolder;
+        this.leashInfoTag = null;
+        if (!this.level().isClientSide && broadcastPacket && this.level() instanceof ServerLevel)
+        {
+            ((ServerLevel)this.level()).getChunkSource().broadcast(this, new ClientboundSetEntityLinkPacket(this, this.leashHolder));
+        }
+        if (this.isPassenger())
+        {
+            this.stopRiding();
+        }
+    }
+
+    public void setDelayedLeashHolderId(int leashHolderID)
+    {
+        this.delayedLeashHolderId = leashHolderID;
+        this.dropLeash(false, false);
+    }
+
+    public void restoreLeashFromSave()
+    {
+        if (this.leashInfoTag != null && this.level() instanceof ServerLevel)
+        {
+            if (this.leashInfoTag.hasUUID("UUID"))
+            {
+                UUID uuid = this.leashInfoTag.getUUID("UUID");
+                Entity entity = ((ServerLevel)this.level()).getEntity(uuid);
+                if (entity != null)
+                {
+                    this.setLeashedTo(entity, true);
+                    return;
+                }
+            }
+            else if (this.leashInfoTag.contains("X", 99) && this.leashInfoTag.contains("Y", 99) && this.leashInfoTag.contains("Z", 99))
+            {
+                BlockPos blockpos = NbtUtils.readBlockPos(this.leashInfoTag);
+                this.setLeashedTo(LeashFenceKnotEntity.getOrCreateKnot(this.level(), blockpos), true);
+                return;
+            }
+            if (this.tickCount > 100)
+            {
+                this.spawnAtLocation(Items.LEAD);
+                this.leashInfoTag = null;
+            }
+        }
+    }*/
 }

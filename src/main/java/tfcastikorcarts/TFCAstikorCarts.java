@@ -8,8 +8,10 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+
 import tfcastikorcarts.client.ClientEventHandler;
 import tfcastikorcarts.common.AstikorItemGroup;
+import tfcastikorcarts.common.container.ContainerTypes;
 import tfcastikorcarts.common.entities.AstikorEntities;
 import tfcastikorcarts.common.items.AstikorItems;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
@@ -30,6 +32,7 @@ public class TFCAstikorCarts
         AstikorEntities.ENTITIES.register(bus);
         TFCAstikorCartsConfig.init();
         AstikorItemGroup.CREATIVE_TABS.register(bus);
+        ContainerTypes.CONTAINERS.register(bus);
         EventHandler.init();
 
         if (FMLEnvironment.dist == Dist.CLIENT)

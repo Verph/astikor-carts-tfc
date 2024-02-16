@@ -3,19 +3,7 @@ package tfcastikorcarts.common.entities.carts;
 import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
-import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
-import de.mennomax.astikorcarts.inventory.container.PlowContainer;
-import de.mennomax.astikorcarts.util.CartItemStackHandler;
-import de.mennomax.astikorcarts.util.ProxyItemUseContext;
-import net.dries007.tfc.common.TFCTags;
-import net.dries007.tfc.common.blocks.GroundcoverBlock;
-import net.dries007.tfc.common.blocks.devices.PlacedItemBlock;
-import net.dries007.tfc.common.blocks.rock.LooseRockBlock;
-import net.dries007.tfc.common.blocks.wood.ILeavesBlock;
-import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
-import net.dries007.tfc.common.container.ISlotCallback;
-import net.dries007.tfc.util.Helpers;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -44,6 +32,22 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.NetworkHooks;
+
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
+import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
+import de.mennomax.astikorcarts.inventory.container.PlowContainer;
+import de.mennomax.astikorcarts.util.CartItemStackHandler;
+import de.mennomax.astikorcarts.util.ProxyItemUseContext;
+
+import net.dries007.tfc.common.TFCTags;
+import net.dries007.tfc.common.blocks.GroundcoverBlock;
+import net.dries007.tfc.common.blocks.devices.PlacedItemBlock;
+import net.dries007.tfc.common.blocks.rock.LooseRockBlock;
+import net.dries007.tfc.common.blocks.wood.ILeavesBlock;
+import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
+import net.dries007.tfc.common.container.ISlotCallback;
+import net.dries007.tfc.util.Helpers;
+
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
 
 public class TFCPlowEntity extends AbstractDrawnInventoryEntity implements ISlotCallback

@@ -4,6 +4,7 @@
 	"package": "tfcastikorcarts.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
+		"AbstractDrawnEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

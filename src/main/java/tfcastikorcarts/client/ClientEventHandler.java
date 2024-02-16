@@ -2,33 +2,62 @@ package tfcastikorcarts.client;
 
 import java.util.Locale;
 
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
 import de.mennomax.astikorcarts.client.renderer.texture.AssembledTexture;
 import de.mennomax.astikorcarts.client.renderer.texture.AssembledTextureFactory;
 import de.mennomax.astikorcarts.client.renderer.texture.Material;
+
 import net.dries007.tfc.TerraFirmaCraft;
 import net.dries007.tfc.common.blocks.TFCBlocks;
 import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import tfcastikorcarts.TFCAstikorCarts;
+
 import tfcastikorcarts.client.renderer.entity.*;
 import tfcastikorcarts.client.renderer.entity.model.*;
+import tfcastikorcarts.client.screen.SupplyCartContainerScreen;
+import tfcastikorcarts.common.container.ContainerTypes;
 import tfcastikorcarts.common.entities.AstikorEntities;
 import tfcastikorcarts.util.AstikorHelpers;
 
+@SuppressWarnings("deprecation")
 public final class ClientEventHandler
 {
     public static void init()
     {
         final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        bus.addListener(ClientEventHandler::clientSetup);
         bus.addListener(ClientEventHandler::registerEntityRenderers);
         bus.addListener(ClientEventHandler::registerLayerDefinitions);
         registerAssembledTextures(bus);
+    }
+
+    public static void clientSetup(FMLClientSetupEvent event)
+    {
+        // Screens
+        event.enqueueWork(() -> {
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_0.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_1.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_2.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_3.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_4.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_5.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_6.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_7.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_8.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_9.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_10.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_11.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_12.get(), SupplyCartContainerScreen::new);
+            MenuScreens.register(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_13.get(), SupplyCartContainerScreen::new);
+        });
     }
 
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event)

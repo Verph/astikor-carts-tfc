@@ -5,11 +5,6 @@ import static tfcastikorcarts.TFCAstikorCarts.MOD_ID;
 import java.util.Locale;
 import java.util.Map;
 
-import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.world.AstikorWorld;
-import de.mennomax.astikorcarts.world.SimpleAstikorWorld;
-import net.dries007.tfc.common.blocks.wood.Wood;
-import net.dries007.tfc.util.Helpers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -22,6 +17,14 @@ import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import de.mennomax.astikorcarts.AstikorCarts;
+import de.mennomax.astikorcarts.world.AstikorWorld;
+import de.mennomax.astikorcarts.world.SimpleAstikorWorld;
+
+import net.dries007.tfc.common.blocks.wood.Wood;
+import net.dries007.tfc.util.Helpers;
+
 import tfcastikorcarts.common.items.AstikorItems;
 import tfcastikorcarts.common.entities.carts.*;
 

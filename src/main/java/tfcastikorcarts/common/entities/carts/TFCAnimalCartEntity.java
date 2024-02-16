@@ -2,12 +2,6 @@ package tfcastikorcarts.common.entities.carts;
 
 import java.util.function.Supplier;
 
-import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
-import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
-import net.dries007.tfc.common.container.ISlotCallback;
-import net.dries007.tfc.util.registry.RegistryWood;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,6 +15,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import de.mennomax.astikorcarts.AstikorCarts;
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
+import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+
+import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
+import net.dries007.tfc.common.container.ISlotCallback;
+import net.dries007.tfc.util.registry.RegistryWood;
 
 import tfcastikorcarts.common.entities.AstikorEntities;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;

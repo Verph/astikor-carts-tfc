@@ -1,14 +1,11 @@
 package tfcastikorcarts.util;
 
-import static tfcastikorcarts.TFCAstikorCarts.MOD_ID;
+import net.minecraft.resources.ResourceLocation;
 
-import net.dries007.tfc.common.capabilities.size.IItemSize;
-import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
 import net.dries007.tfc.common.capabilities.size.Size;
 import net.dries007.tfc.common.capabilities.size.Weight;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
+
+import static tfcastikorcarts.TFCAstikorCarts.MOD_ID;
 
 public class AstikorHelpers
 {
