@@ -57,8 +57,7 @@ import net.dries007.tfc.util.Helpers;
 
 import tfcastikorcarts.client.sound.TFCCartingJukeboxSound;
 import tfcastikorcarts.common.container.ContainerList;
-import tfcastikorcarts.common.container.ContainerTypes;
-import tfcastikorcarts.common.container.RestrictedCartContainer;
+import tfcastikorcarts.common.container.SupplyCartContainer;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
 import tfcastikorcarts.util.AstikorHelpers;
 
@@ -148,7 +147,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     public float countOverburdened()
     {
         float count = 0;
-        for (int i = 0; i < this.inventory.getSlots(); i++)
+        for (int i = 0; i < this.getContainerSize(); i++)
         {
             final ItemStack stack = this.inventory.getStackInSlot(i);
             if (!stack.isEmpty())
@@ -164,7 +163,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     @Override
     public ItemStackHandler initInventory()
     {
-        return new CartItemStackHandler<TFCSupplyCartEntity>(ContainerList.getSlots(TFCAstikorCartsConfig.COMMON.supplyCartInventorySize.get()), this)
+        return new CartItemStackHandler<TFCSupplyCartEntity>(TFCAstikorCartsConfig.COMMON.supplyCartInventorySize.get().getSize(), this)
         {
             @Override
             public void onLoad()
@@ -181,7 +180,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
                 for (int i = 0; i < this.getSlots(); i++)
                 {
                     final ItemStack stack = this.getStackInSlot(i);
-                    if (!stack.isEmpty() && isValid(stack))
+                    if (!stack.isEmpty())
                     {
                         totals.mergeInt(stack.getItem(), 1, Integer::sum);
                         stacks.putIfAbsent(stack.getItem(), stack);
@@ -201,11 +200,8 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
                     for (int n = 1; n <= count && pos < CARGO.size(); n++)
                     {
                         final ItemStack stack = stacks.getOrDefault(entry.getKey(), ItemStack.EMPTY).copy();
-                        if (isValid(stack))
-                        {
-                            stack.setCount(Math.min(stack.getMaxStackSize(), entry.getIntValue() / n));
-                            items[pos++] = stack;
-                        }
+                        stack.setCount(Math.min(stack.getMaxStackSize(), entry.getIntValue() / n));
+                        items[pos++] = stack;
                     }
                 }
                 for (int i = 0; i < CARGO.size(); i++)
@@ -255,10 +251,6 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
             }*/
             return flag ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
-        if (!isValid(held))
-        {
-            return InteractionResult.FAIL;
-        }
         /*if (this.getLeashHolder() == player)
         {
             this.dropLeash(true, !player.getAbilities().instabuild);
@@ -300,7 +292,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
 
     public boolean insertDisc(final Player player, final ItemStack held)
     {
-        for (int i = 0; i < this.inventory.getSlots(); i++)
+        for (int i = 0; i < this.getContainerSize(); i++)
         {
             final ItemStack stack = this.inventory.getStackInSlot(i);
             if (DiscTag.insert(stack, held))
@@ -317,7 +309,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
 
     public boolean ejectDisc(final Player player)
     {
-        for (int i = 0; i < this.inventory.getSlots(); i++)
+        for (int i = 0; i < this.getContainerSize(); i++)
         {
             final ItemStack stack = this.inventory.getStackInSlot(i);
             final DiscTag record = DiscTag.get(stack);
@@ -428,7 +420,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
         {
             ContainerList containerSize = TFCAstikorCartsConfig.COMMON.supplyCartInventorySize.get();
             player.openMenu(new SimpleMenuProvider((id, inv, plyr) -> {
-                return new RestrictedCartContainer(containerSize.getMenuType(), id, inv, this, containerSize);
+                return new SupplyCartContainer(containerSize, id, inv, this);
             }, this.getDisplayName()));
         }
     }
@@ -442,7 +434,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     @Override
     public boolean isEmpty()
     {
-        for(int i =0; i < this.inventory.getSlots(); i++)
+        for(int i =0; i < this.getContainerSize(); i++)
         {
             ItemStack itemstack = this.inventory.getStackInSlot(i);
             if (!itemstack.isEmpty())
@@ -473,10 +465,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     @Override
     public void setItem(int slot, @NotNull ItemStack stack)
     {
-        if (isValid(stack))
-        {
-            inventory.setStackInSlot(slot, stack);
-        }
+        inventory.setStackInSlot(slot, stack);
     }
 
     @Override
@@ -493,7 +482,7 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     @Override
     public void clearContent()
     {
-        for(int i =0; i < this.inventory.getSlots(); i++)
+        for(int i = 0; i < this.getContainerSize(); i++)
         {
             removeItemNoUpdate(i);
         }

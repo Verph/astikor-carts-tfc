@@ -5,137 +5,134 @@ import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-
+import tfcastikorcarts.common.container.SupplyCartContainer.RestrictedSlotItemHandler;
 import tfcastikorcarts.common.entities.carts.TFCSupplyCartEntity;
 
-public class CartContainer extends ChestMenu
+public class CartContainer extends AbstractContainerMenu 
 {
     public static CartContainer createSize0(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_0.get(), windowId, playerInv, ContainerList.SIZE_0);
+        return new CartContainer(ContainerList.SIZE_0, windowId, playerInv);
     }
 
     public static CartContainer createSize1(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_1.get(), windowId, playerInv, ContainerList.SIZE_1);
+        return new CartContainer(ContainerList.SIZE_1, windowId, playerInv);
     }
 
     public static CartContainer createSize2(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_2.get(), windowId, playerInv, ContainerList.SIZE_2);
+        return new CartContainer(ContainerList.SIZE_2, windowId, playerInv);
     }
 
     public static CartContainer createSize3(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_3.get(), windowId, playerInv, ContainerList.SIZE_3);
+        return new CartContainer(ContainerList.SIZE_3, windowId, playerInv);
     }
 
     public static CartContainer createSize4(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_4.get(), windowId, playerInv, ContainerList.SIZE_4);
+        return new CartContainer(ContainerList.SIZE_4, windowId, playerInv);
     }
 
     public static CartContainer createSize5(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_5.get(), windowId, playerInv, ContainerList.SIZE_5);
+        return new CartContainer(ContainerList.SIZE_5, windowId, playerInv);
     }
 
     public static CartContainer createSize6(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_6.get(), windowId, playerInv, ContainerList.SIZE_6);
+        return new CartContainer(ContainerList.SIZE_6, windowId, playerInv);
     }
 
     public static CartContainer createSize7(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_7.get(), windowId, playerInv, ContainerList.SIZE_7);
+        return new CartContainer(ContainerList.SIZE_7, windowId, playerInv);
     }
 
     public static CartContainer createSize8(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_8.get(), windowId, playerInv, ContainerList.SIZE_8);
+        return new CartContainer(ContainerList.SIZE_8, windowId, playerInv);
     }
 
     public static CartContainer createSize9(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_9.get(), windowId, playerInv, ContainerList.SIZE_9);
+        return new CartContainer(ContainerList.SIZE_9, windowId, playerInv);
     }
 
     public static CartContainer createSize10(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_10.get(), windowId, playerInv, ContainerList.SIZE_10);
+        return new CartContainer(ContainerList.SIZE_10, windowId, playerInv);
     }
 
     public static CartContainer createSize11(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_11.get(), windowId, playerInv, ContainerList.SIZE_11);
+        return new CartContainer(ContainerList.SIZE_11, windowId, playerInv);
     }
 
     public static CartContainer createSize12(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_12.get(), windowId, playerInv, ContainerList.SIZE_12);
+        return new CartContainer(ContainerList.SIZE_12, windowId, playerInv);
     }
 
     public static CartContainer createSize13(int windowId, Inventory playerInv, FriendlyByteBuf data)
     {
-        return new CartContainer(ContainerTypes.SUPPLY_CART_CONTAINER_SIZE_13.get(), windowId, playerInv, ContainerList.SIZE_13);
+        return new CartContainer(ContainerList.SIZE_13, windowId, playerInv);
     }
 
-    // Default value of false when checked via super(), which calls addSlot()
-    // Only set to true to allow this constructor to add slots.
     public final boolean allowAddSlot;
-    public final ContainerList containerType;
+    public final ContainerList type;
+    public final Container container;
 
-    public CartContainer(MenuType<?> type, int id, Inventory inv, ContainerList containerType)
+    public CartContainer(ContainerList type, int id, Inventory inv)
     {
-        this(type, id, inv, new SimpleContainer(containerType.getSize()), containerType);
+        this(type, id, inv, new SimpleContainer(type.getSize()));
     }
 
-    public CartContainer(MenuType<?> type, int id, Inventory playerInv, Container container, ContainerList containerType)
+    public CartContainer(ContainerList type, int id, Inventory playerInv, Container container)
     {
-        super(type, id, playerInv, container, containerType.getRows());
-        checkContainerSize(container, containerType.getSize());
+        super(type.getMenuType(), id);
+        checkContainerSize(container, type.getSize());
         container.startOpen(playerInv.player);
-        this.containerType = containerType;
+        this.type = type;
+        this.container = container;
+        this.allowAddSlot = true;
+        final int columns = type.getColumns();
+        final int rows = type.getRows();
 
-        allowAddSlot = true;
-
-        /* 
-         * TODO: Fix this shite!
-         */
         // Container
-        if (containerType.getSize() <= 1)
+        if (type.getSize() <= 1)
         {
-            this.addSlot(new RestrictedSlot(playerInv, 0, 12 + 4 * 18, 8 + 2 * 18));
+            this.addSlot(new RestrictedSlot(container, 0, 84, 44));
         }
         else
         {
-            for (int chestRow = 0; chestRow < containerType.getRows(); chestRow++)
+            for (int chestRow = 0; chestRow < rows; chestRow++)
             {
-                for (int chestCol = 0; chestCol < containerType.getColumns(); chestCol++)
+                for (int chestCol = 0; chestCol < columns; chestCol++)
                 {
-                    this.addSlot(new RestrictedSlot(playerInv, chestCol + chestRow * containerType.getColumns(), 12 + chestCol * 18, 18 + chestRow * 18));
+                    this.addSlot(new RestrictedSlot(container, chestCol + chestRow * columns, 12 + chestCol * 18, 18 + chestRow * 18));
                 }
             }
         }
 
         // Player Inventory + Hotbar
-        int leftCol = (containerType.xSize - 162) / 2 + 1;
+        int leftCol = (type.xSize - 162) / 2 + 1;
 
         for (int playerInvRow = 0; playerInvRow < 3; playerInvRow++)
         {
             for (int playerInvCol = 0; playerInvCol < 9; playerInvCol++)
             {
-                this.addSlot(new Slot(playerInv, playerInvCol + playerInvRow * 9 + 9, leftCol + playerInvCol * 18, containerType.ySize - (4 - playerInvRow) * 18 - 10));
+                this.addSlot(new Slot(playerInv, playerInvCol + playerInvRow * 9 + 9, leftCol + playerInvCol * 18, type.ySize - (4 - playerInvRow) * 18 - 10));
             }
         }
 
         for (int hotbarCol = 0; hotbarCol < 9; hotbarCol++)
         {
-            this.addSlot(new Slot(playerInv, hotbarCol, leftCol + hotbarCol * 18, containerType.ySize - 24));
+            this.addSlot(new Slot(playerInv, hotbarCol, leftCol + hotbarCol * 18, type.ySize - 24));
         }
     }
 
@@ -144,6 +141,7 @@ public class CartContainer extends ChestMenu
     {
         ItemStack stack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
+
         if (slot instanceof RestrictedSlot rest && slot.hasItem())
         {
             ItemStack item = slot.getItem();
@@ -152,50 +150,54 @@ public class CartContainer extends ChestMenu
                 return ItemStack.EMPTY;
             }
         }
-        else
+
+        if (slot != null && slot.hasItem())
         {
-            if (slot != null && slot.hasItem())
+            ItemStack slotStack = slot.getItem();
+            stack = slotStack.copy();
+
+            if (index < this.type.getSize())
             {
-                ItemStack slotStack = slot.getItem();
-                stack = slotStack.copy();
-
-                if (index < this.containerType.size)
-                {
-                    if (!this.moveItemStackTo(slotStack, this.containerType.size, this.slots.size(), true))
-                    {
-                    return ItemStack.EMPTY;
-                    }
-                }
-                else if (!this.moveItemStackTo(slotStack, 0, this.containerType.size, false))
+                if (!this.moveItemStackTo(slotStack, this.type.getSize(), this.slots.size(), true))
                 {
                     return ItemStack.EMPTY;
                 }
+            }
+            else if (!this.moveItemStackTo(slotStack, 0, this.type.getSize(), false))
+            {
+                return ItemStack.EMPTY;
+            }
 
-                if (slotStack.isEmpty())
-                {
-                    slot.set(ItemStack.EMPTY);
-                }
-                else
-                {
-                    slot.setChanged();
-                }
+            if (slotStack.isEmpty())
+            {
+                slot.set(ItemStack.EMPTY);
+            }
+            else
+            {
+                slot.setChanged();
             }
         }
         return stack;
     }
 
     @Override
-    protected Slot addSlot(Slot slot)
+    public Slot addSlot(Slot slot)
     {
         return allowAddSlot ? super.addSlot(slot) : slot;
     }
 
-    public ContainerList getContainerType()
+    @Override
+    public boolean stillValid(final Player player)
     {
-        return containerType;
+        return this.container.stillValid(player);
     }
 
-    private static class RestrictedSlot extends Slot
+    public ContainerList getContainerType()
+    {
+        return type;
+    }
+
+    public static class RestrictedSlot extends Slot
     {
         public RestrictedSlot(Container container, int slot, int x, int y)
         {
