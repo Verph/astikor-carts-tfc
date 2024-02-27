@@ -17,9 +17,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+
 import net.dries007.tfc.common.TFCEffects;
 import net.dries007.tfc.common.capabilities.food.TFCFoodData;
 import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
@@ -27,7 +27,6 @@ import net.dries007.tfc.common.container.ISlotCallback;
 import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.registry.RegistryWood;
 
-import tfcastikorcarts.TFCAstikorCarts;
 import tfcastikorcarts.common.entities.AstikorEntities;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
 
@@ -276,6 +275,6 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
     @Override
     public Item getCartItem()
     {
-        return AstikorCarts.Items.ANIMAL_CART.get();
+        return drop.get();
     }
 }
