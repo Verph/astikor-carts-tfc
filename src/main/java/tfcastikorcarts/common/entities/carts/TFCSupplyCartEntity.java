@@ -1,7 +1,6 @@
 package tfcastikorcarts.common.entities.carts;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -50,6 +49,7 @@ import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 
 import net.dries007.tfc.common.TFCEffects;
+import net.dries007.tfc.common.capabilities.food.TFCFoodData;
 import net.dries007.tfc.common.capabilities.size.IItemSize;
 import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
 import net.dries007.tfc.common.container.ISlotCallback;
@@ -110,37 +110,39 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
     public void pulledTick()
     {
         super.pulledTick();
+
         if (this.getPulling() == null)
         {
             return;
         }
-        if (!this.level().isClientSide)
+
+        Player player = null;
+
+        if (this.getPulling() instanceof Player pl)
         {
-            Player player = null;
-            if (this.getPulling() instanceof Player pl)
+            player = pl;
+        }
+        else if (this.getPulling().getControllingPassenger() instanceof Player pl)
+        {
+            player = pl;
+        }
+        if (player != null && player.getFoodData() instanceof TFCFoodData foodData)
+        {
+            double weightFactor = countOverburdened();
+            if (weightFactor > TFCAstikorCartsConfig.COMMON.pinnedThreshold.get())
             {
-                player = pl;
+                player.addEffect(new MobEffectInstance(TFCEffects.PINNED.get(), 25, 0, false, false));
             }
-            else if (this.getPulling().getControllingPassenger() instanceof Player pl)
+            else if (weightFactor > TFCAstikorCartsConfig.COMMON.overburdenedThreshold.get())
             {
-                player = pl;
+                player.addEffect(Helpers.getOverburdened(false));
             }
-            if (player != null)
+            else if (weightFactor > TFCAstikorCartsConfig.COMMON.exhaustedThreshold.get())
             {
-                float weightFactor = countOverburdened();
-                if (weightFactor > TFCAstikorCartsConfig.COMMON.exhaustedThreshold.get())
-                {
-                    player.addEffect(Helpers.getExhausted(false));
-                }
-                if (weightFactor > TFCAstikorCartsConfig.COMMON.overburdenedThreshold.get())
-                {
-                    player.addEffect(Helpers.getOverburdened(false));
-                }
-                if (weightFactor > TFCAstikorCartsConfig.COMMON.pinnedThreshold.get())
-                {
-                    player.addEffect(new MobEffectInstance(TFCEffects.EXHAUSTED.get(), 25, 0, false, false));
-                }
+                player.addEffect(Helpers.getExhausted(false));
             }
+            final double healthFactor = TFCAstikorCartsConfig.COMMON.toggleFoodSpeed.get() ? Mth.map(foodData.getNutrition().getAverageNutrition(), 0D, 1.0D, 0.75D, 1.0D) * Mth.map(foodData.getThirst(), 0D, 100D, 0.5D, 1.0D) : 1.0D;
+            player.setDeltaMovement(player.getDeltaMovement().multiply(healthFactor, 1.0D, healthFactor));
         }
     }
 
@@ -152,8 +154,8 @@ public class TFCSupplyCartEntity extends AbstractDrawnInventoryEntity implements
             final ItemStack stack = this.inventory.getStackInSlot(i);
             if (!stack.isEmpty())
             {
-                IItemSize size = ItemSizeManager.get(stack);
-                float weightFactor = AstikorHelpers.getWeightFactor(size.getWeight(stack), size.getSize(stack));
+                IItemSize item = ItemSizeManager.get(stack);
+                float weightFactor = AstikorHelpers.getWeightFactor(item.getWeight(stack), item.getSize(stack));
                 count += weightFactor;
             }
         }

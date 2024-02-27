@@ -44,11 +44,14 @@ import net.dries007.tfc.common.blocks.GroundcoverBlock;
 import net.dries007.tfc.common.blocks.devices.PlacedItemBlock;
 import net.dries007.tfc.common.blocks.rock.LooseRockBlock;
 import net.dries007.tfc.common.blocks.wood.ILeavesBlock;
+import net.dries007.tfc.common.capabilities.food.TFCFoodData;
+import net.dries007.tfc.common.capabilities.size.IItemSize;
 import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
 import net.dries007.tfc.common.container.ISlotCallback;
 import net.dries007.tfc.util.Helpers;
 
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
+import tfcastikorcarts.util.AstikorHelpers;
 
 public class TFCPlowEntity extends AbstractDrawnInventoryEntity implements ISlotCallback
 {
@@ -72,57 +75,98 @@ public class TFCPlowEntity extends AbstractDrawnInventoryEntity implements ISlot
         SynchedEntityData.defineId(TFCPlowEntity.class, EntityDataSerializers.ITEM_STACK),
         SynchedEntityData.defineId(TFCPlowEntity.class, EntityDataSerializers.ITEM_STACK));
 
-    public TFCPlowEntity(final EntityType<? extends Entity> entityTypeIn, final Level worldIn, Supplier<? extends Item> drop) {
+    public TFCPlowEntity(final EntityType<? extends Entity> entityTypeIn, final Level worldIn, Supplier<? extends Item> drop)
+    {
         super(entityTypeIn, worldIn);
         this.spacing = 1.3D;
         this.drop = drop;
     }
 
     @Override
-    public AstikorCartsConfig.CartConfig getConfig() {
+    public AstikorCartsConfig.CartConfig getConfig()
+    {
         return AstikorCartsConfig.get().plow;
     }
 
     @Override
-    public ItemStackHandler initInventory() {
-        return new CartItemStackHandler<TFCPlowEntity>(SLOT_COUNT, this) {
+    public ItemStackHandler initInventory()
+    {
+        return new CartItemStackHandler<TFCPlowEntity>(SLOT_COUNT, this)
+        {
             @Override
-            public void onLoad() {
-                for (int i = 0; i < TOOLS.size(); i++) {
+            public void onLoad()
+            {
+                for (int i = 0; i < TOOLS.size(); i++)
+                {
                     this.cart.getEntityData().set(TOOLS.get(i), this.getStackInSlot(i));
                 }
             }
 
             @Override
-            public void onContentsChanged(final int slot) {
+            public void onContentsChanged(final int slot)
+            {
                 this.cart.updateSlot(slot);
             }
         };
     }
 
-    public boolean getPlowing() {
+    public boolean getPlowing()
+    {
         return this.entityData.get(PLOWING);
     }
 
     @Override
-    public void pulledTick() {
+    public void pulledTick()
+    {
         super.pulledTick();
-        if (this.getPulling() == null) {
+
+        if (this.getPulling() == null)
+        {
             return;
         }
-        if (!this.level().isClientSide) {
-            Player player = null;
-            if (this.getPulling() instanceof Player pl) {
-                player = pl;
-            } else if (this.getPulling().getControllingPassenger() instanceof Player pl) {
-                player = pl;
-            }
-            if (this.entityData.get(PLOWING) && player != null) {
-                if (this.xo != this.getX() || this.zo != this.getZ()) {
+
+        Player player = null;
+
+        if (this.getPulling() instanceof Player pl)
+        {
+            player = pl;
+        }
+        else if (this.getPulling().getControllingPassenger() instanceof Player pl)
+        {
+            player = pl;
+        }
+        if (player != null && !this.level().isClientSide)
+        {
+            if (this.entityData.get(PLOWING))
+            {
+                if (this.xo != this.getX() || this.zo != this.getZ())
+                {
                     this.plow(player);
                 }
             }
         }
+        if (player != null && player.getFoodData() instanceof TFCFoodData foodData)
+        {
+            final double healthFactor = TFCAstikorCartsConfig.COMMON.toggleFoodSpeed.get() ? Mth.map(foodData.getNutrition().getAverageNutrition(), 0D, 1.0D, 0.75D, 1.0D) * Mth.map(foodData.getThirst(), 0D, 100D, 0.5D, 1.0D) : 1.0D;
+            final double speedFactor = Mth.clamp(healthFactor * Mth.map(countOverburdened(), 0D, 35D, 0.5D, 1.0D), 0.25D, 1.0D);
+            player.setDeltaMovement(player.getDeltaMovement().multiply(speedFactor, 1.0D, speedFactor));
+        }
+    }
+
+    public float countOverburdened()
+    {
+        float count = 0;
+        for (int i = 0; i < SLOT_COUNT; i++)
+        {
+            final ItemStack stack = this.getStackInSlot(i);
+            if (!stack.isEmpty())
+            {
+                IItemSize item = ItemSizeManager.get(stack);
+                float weightFactor = AstikorHelpers.getWeightFactor(item.getWeight(stack), item.getSize(stack));
+                count += weightFactor;
+            }
+        }
+        return count;
     }
 
     public void plow(final Player player)
@@ -238,60 +282,75 @@ public class TFCPlowEntity extends AbstractDrawnInventoryEntity implements ISlot
     }
 
     @Override
-    public InteractionResult interact(final Player player, final InteractionHand hand) {
-        if (player.isSecondaryUseActive()) {
+    public InteractionResult interact(final Player player, final InteractionHand hand)
+    {
+        if (player.isSecondaryUseActive())
+        {
             this.openContainer(player);
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide)
+        {
             this.entityData.set(PLOWING, !this.entityData.get(PLOWING));
         }
         return InteractionResult.sidedSuccess(this.level().isClientSide);
     }
 
-    public void updateSlot(final int slot) {
-        if (!this.level().isClientSide) {
-            if (this.inventory.getStackInSlot(slot).isEmpty()) {
+    public void updateSlot(final int slot)
+    {
+        if (!this.level().isClientSide)
+        {
+            if (this.inventory.getStackInSlot(slot).isEmpty())
+            {
                 this.entityData.set(TOOLS.get(slot), ItemStack.EMPTY);
-            } else {
+            }
+            else
+            {
                 this.entityData.set(TOOLS.get(slot), this.inventory.getStackInSlot(slot));
             }
-
         }
     }
 
-    public ItemStack getStackInSlot(final int i) {
+    public ItemStack getStackInSlot(final int i)
+    {
         return this.entityData.get(TOOLS.get(i));
     }
 
     @Override
-    public Item getCartItem() {
+    public Item getCartItem()
+    {
         return drop.get();
     }
 
     @Override
-    public void defineSynchedData() {
+    public void defineSynchedData()
+    {
         super.defineSynchedData();
         this.entityData.define(PLOWING, false);
-        for (final EntityDataAccessor<ItemStack> param : TOOLS) {
+        for (final EntityDataAccessor<ItemStack> param : TOOLS)
+        {
             this.entityData.define(param, ItemStack.EMPTY);
         }
     }
 
     @Override
-    public void readAdditionalSaveData(final CompoundTag compound) {
+    public void readAdditionalSaveData(final CompoundTag compound)
+    {
         super.readAdditionalSaveData(compound);
         this.entityData.set(PLOWING, compound.getBoolean("Plowing"));
     }
 
     @Override
-    public void addAdditionalSaveData(final CompoundTag compound) {
+    public void addAdditionalSaveData(final CompoundTag compound)
+    {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Plowing", this.entityData.get(PLOWING));
     }
 
-    public void openContainer(final Player player) {
-        if (player instanceof ServerPlayer serverPlayer) {
+    public void openContainer(final Player player)
+    {
+        if (player instanceof ServerPlayer serverPlayer)
+        {
             NetworkHooks.openScreen(serverPlayer,
                 new SimpleMenuProvider((windowId, playerInventory, p) -> new PlowContainer(windowId, playerInventory, this), this.getDisplayName()),
                 buf -> buf.writeInt(this.getId())

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,11 +20,14 @@ import net.minecraft.world.phys.Vec3;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
-
+import net.dries007.tfc.common.TFCEffects;
+import net.dries007.tfc.common.capabilities.food.TFCFoodData;
 import net.dries007.tfc.common.capabilities.size.ItemSizeManager;
 import net.dries007.tfc.common.container.ISlotCallback;
+import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.registry.RegistryWood;
 
+import tfcastikorcarts.TFCAstikorCarts;
 import tfcastikorcarts.common.entities.AstikorEntities;
 import tfcastikorcarts.config.TFCAstikorCartsConfig;
 
@@ -55,6 +59,61 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
     public AstikorCartsConfig.CartConfig getConfig()
     {
         return AstikorCartsConfig.get().animalCart;
+    }
+
+    @Override
+    public void pulledTick()
+    {
+        super.pulledTick();
+
+        if (this.getPulling() == null)
+        {
+            return;
+        }
+
+        Player player = null;
+
+        if (this.getPulling() instanceof Player pl)
+        {
+            player = pl;
+        }
+        else if (this.getPulling().getControllingPassenger() instanceof Player pl)
+        {
+            player = pl;
+        }
+        if (player != null && player.getFoodData() instanceof TFCFoodData foodData)
+        {
+            final double animalWeight = countOverburdened();
+            final double healthFactor = TFCAstikorCartsConfig.COMMON.toggleFoodSpeed.get() ? Mth.map(foodData.getNutrition().getAverageNutrition(), 0D, 1.0D, 0.75D, 1.0D) * Mth.map(foodData.getThirst(), 0D, 100D, 0.5D, 1.0D) : 1.0D;
+            final double speedFactor = Mth.clamp(healthFactor / animalWeight, 0D, 1.0D);
+            player.setDeltaMovement(player.getDeltaMovement().multiply(speedFactor, 1.0D, speedFactor));
+
+            if (animalWeight > 30D)
+            {
+                player.addEffect(new MobEffectInstance(TFCEffects.PINNED.get(), 25, 0, false, false));
+            }
+            else if (animalWeight > 20D)
+            {
+                player.addEffect(Helpers.getOverburdened(false));
+            }
+            else if (animalWeight > 10D)
+            {
+                player.addEffect(Helpers.getExhausted(false));
+            }
+        }
+    }
+
+    public float countOverburdened()
+    {
+        float count = 1f;
+        if (this.getPassengers().size() > 0)
+        {
+            for (int i = 0; i < this.getPassengers().size(); i++)
+            {
+                count += this.getPassengers().get(i).getBoundingBox().getSize();
+            }
+        }
+        return count;
     }
 
     public TFCPostilionEntity getPostilionEntity(RegistryWood wood)
@@ -95,10 +154,14 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
     @Override
     public InteractionResult interact(final Player player, final InteractionHand hand)
     {
-        if (player.isSecondaryUseActive()) {
-            if (!this.level().isClientSide) {
-                for (final Entity entity : this.getPassengers()) {
-                    if (!(entity instanceof Player)) {
+        if (player.isSecondaryUseActive())
+        {
+            if (!this.level().isClientSide)
+            {
+                for (final Entity entity : this.getPassengers())
+                {
+                    if (!(entity instanceof Player))
+                    {
                         entity.stopRiding();
                     }
                 }
@@ -106,14 +169,18 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         }
         final InteractionResult bannerResult = this.useBanner(player, hand);
-        if (bannerResult.consumesAction()) {
+        if (bannerResult.consumesAction())
+        {
             return bannerResult;
         }
-        if (this.getPulling() != player) {
-            if (!this.canAddPassenger(player)) {
+        if (this.getPulling() != player)
+        {
+            if (!this.canAddPassenger(player))
+            {
                 return InteractionResult.PASS;
             }
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide)
+            {
                 return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
             }
             return InteractionResult.SUCCESS;
@@ -126,8 +193,9 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
     {
         if (!entityIn.hasPassenger(this))
         {
-            if (!this.level().isClientSide && this.getPulling() != entityIn && this.getControllingPassenger() == null && this.getPassengers().size() <= TFCAstikorCartsConfig.COMMON.maxAnimalSize.get() && !entityIn.isPassenger() && (entityIn.getBbWidth() < this.getBbWidth() || this.getPassengers().size() <= TFCAstikorCartsConfig.COMMON.maxAnimalSize.get()) && entityIn instanceof LivingEntity
-                && canCarryWaterEntities(entityIn) && canPushIntoPlayers(entityIn))
+            final double animalSize = entityIn.getBoundingBox().getSize();
+            final double maxAnimalSize = TFCAstikorCartsConfig.COMMON.maxAnimalSize.get();
+            if (!this.level().isClientSide && this.getPulling() != entityIn && this.getControllingPassenger() == null && animalSize <= maxAnimalSize && !entityIn.isPassenger() && (entityIn.getBbWidth() < this.getBbWidth() || animalSize <= maxAnimalSize) && entityIn instanceof LivingEntity && canCarryWaterEntities(entityIn) && canPushIntoPlayers(entityIn))
             {
                 entityIn.startRiding(this);
             }
@@ -157,24 +225,31 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
     @Override
     public boolean canAddPassenger(final Entity passenger)
     {
-        return this.getPassengers().size() <= TFCAstikorCartsConfig.COMMON.maxAnimalSize.get();
+        final double animalSize = passenger.getBoundingBox().getSize();
+        final double maxAnimalSize = TFCAstikorCartsConfig.COMMON.maxAnimalSize.get();
+        return animalSize <= maxAnimalSize && this.getPassengers().size() <= TFCAstikorCartsConfig.COMMON.maxPassengerCount.get();
     }
 
     @Override
-    public double getPassengersRidingOffset() {
+    public double getPassengersRidingOffset()
+    {
         return 11.0D / 16.0D;
     }
 
 
     @Override
-    public void positionRider(Entity passenger, MoveFunction pCallback) {
-        if (this.hasPassenger(passenger)) {
+    public void positionRider(Entity passenger, MoveFunction pCallback)
+    {
+        if (this.hasPassenger(passenger))
+        {
             double f = -0.1D;
 
-            if (this.getPassengers().size() > 1) {
+            if (this.getPassengers().size() > 1)
+            {
                 f = this.getPassengers().indexOf(passenger) == 0 ? 0.2D : -0.6D;
 
-                if (passenger instanceof Animal) {
+                if (passenger instanceof Animal)
+                {
                     f += 0.2D;
                 }
             }
@@ -189,7 +264,8 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
             passenger.yRotO += f1 - f2;
             passenger.setYRot(passenger.getYRot() + (f1 - f2));
             passenger.setYHeadRot(passenger.getYRot());
-            if (passenger instanceof Animal && this.getPassengers().size() > 1) {
+            if (passenger instanceof Animal && this.getPassengers().size() > 1)
+            {
                 final int j = passenger.getId() % 2 == 0 ? 90 : 270;
                 passenger.setYBodyRot(((Animal) passenger).yBodyRot + j);
                 passenger.setYHeadRot(passenger.getYHeadRot() + j);
@@ -198,7 +274,8 @@ public class TFCAnimalCartEntity extends AbstractDrawnEntity implements ISlotCal
     }
 
     @Override
-    public Item getCartItem() {
+    public Item getCartItem()
+    {
         return AstikorCarts.Items.ANIMAL_CART.get();
     }
 }

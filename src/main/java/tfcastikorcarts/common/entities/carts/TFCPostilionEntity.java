@@ -49,31 +49,39 @@ public class TFCPostilionEntity extends DummyLivingEntity implements ISlotCallba
     }
 
     @Override
-    public double getMyRidingOffset() {
+    public double getMyRidingOffset()
+    {
         return 0.125D;
     }
 
     @Override
-    public void tick() {
+    public void tick()
+    {
         super.tick();
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide)
+        {
             final LivingEntity coachman = this.getCoachman();
-            if (coachman != null) {
+            if (coachman != null)
+            {
                 this.setYRot(coachman.getYRot());
                 this.yRotO = this.getYRot();
                 this.setXRot(coachman.getXRot() * 0.5F);
                 this.zza = coachman.zza;
                 this.xxa = 0.0F;
-            } else {
+            }
+            else
+            {
                 this.discard();
             }
         }
     }
 
     @Nullable
-    public LivingEntity getCoachman() {
+    public LivingEntity getCoachman()
+    {
         final Entity mount = this.getVehicle();
-        if (mount != null) {
+        if (mount != null)
+        {
             return AstikorWorld.get(this.level()).map(m -> m.getDrawn(mount)).orElse(Optional.empty())
                 .map(AbstractDrawnEntity::getControllingPassenger).orElse(null);
         }
@@ -81,7 +89,8 @@ public class TFCPostilionEntity extends DummyLivingEntity implements ISlotCallba
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket()
+    {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 }
