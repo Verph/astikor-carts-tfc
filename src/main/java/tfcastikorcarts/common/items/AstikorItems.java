@@ -1,18 +1,20 @@
 package tfcastikorcarts.common.items;
 
-import static tfcastikorcarts.TFCAstikorCarts.MOD_ID;
-
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import de.mennomax.astikorcarts.item.CartItem;
-import net.dries007.tfc.common.blocks.wood.Wood;
-import net.dries007.tfc.util.Helpers;
 import net.minecraft.world.item.*;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import de.mennomax.astikorcarts.item.CartItem;
+
+import net.dries007.tfc.common.blocks.wood.Wood;
+import net.dries007.tfc.util.Helpers;
+
+import static tfcastikorcarts.TFCAstikorCarts.MOD_ID;
 
 @SuppressWarnings("unused")
 public class AstikorItems
